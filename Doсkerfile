@@ -1,0 +1,23 @@
+# Використання офіційного Python image від Docker Hub
+FROM python:3.12.0
+
+# Встановлення системних залежностей, якщо потрібно
+#RUN apt-get update \
+#    && apt-get install -y \
+#        git \
+#    && rm -rf /var/lib/apt/lists/*
+
+# Переміщення до робочого каталогу /app
+WORKDIR /app
+
+# Копіювання файлів залежностей і встановлення їх
+COPY src/requirements.txt .
+
+# Встановлення залежностей Python
+RUN pip install --no-cache-dir -r src/requirements.txt
+
+# Копіювання всіх файлів додатку в робочий каталог /app
+COPY . .
+
+# Команда для запуску додатку
+CMD ["python", "src/bot.py"]
