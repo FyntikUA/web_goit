@@ -3,12 +3,13 @@ import shutil
 import re
 import pathlib
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from View.base_view import ConsoleView
 
-# Настройка логгирования
+# Настройка логування
 logging.basicConfig(filename='file_sorter.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
-# Dictionary mapping file types to their corresponding extensions
+# список всіх підтримуємих форматів
 DIRECTORIES = {
     "Images": [".jpeg", ".jpg", ".tiff", ".gif", ".bmp", ".png", ".bpg", ".svg", ".heif", ".psd"],
     "Videos": [".avi", ".flv", ".wmv", ".mov", ".mp4", ".webm", ".vob", ".mng", ".qt", ".mpg", ".mpeg", ".3gp"],
@@ -118,10 +119,15 @@ def process_directory(root):
     """
     print("File sorting in progress ...")
     create_directories(root)
-    for path, _, files in os.walk(root):
-        for file in files:
-            file_path = os.path.join(path, file)
-            process_file(file_path, root)
+
+    def process_file_wrapper(file):
+        file_path = os.path.join(root, file)
+        process_file(file_path, root)
+
+    with ThreadPoolExecutor() as executor:
+        for path, _, files in os.walk(root):
+            executor.map(process_file_wrapper, files)
+
     print("File sorting completed.")
 
 
@@ -141,9 +147,6 @@ def delete_empty_directories(root):
 
 
 def run_file_sorter():
-    """
-    Entry point to run the file sorting process.
-    """
     view = ConsoleView()
     while True:
         path = view.get_input("Enter the path to directory you want to sort: ")
