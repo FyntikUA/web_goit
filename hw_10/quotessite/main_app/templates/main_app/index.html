@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+</head>
+<body>
+    {% for author in page_obj %}
+    <h2><a href="{% url 'author_detail' author.id %}">{{ author.fullname }}</a></h2>
+    <ul>
+        {% for quote in author.quote_set.all|slice:":5" %}
+        <li>{{ quote.quote }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+    {% if page_obj.has_previous %}
+    <a href="?page=1"><< Перша сторінка</a>
+    <a href="?page={{ page_obj.previous_page_number }}">Попередня</a>
+    {% endif %}
+
+    <span>Сторінка {{ page_obj.number }} з {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Наступна ></a>
+    <a href="?page={{ page_obj.paginator.num_pages }}">Остання сторінка >></a>
+    {% endif %}
+</body>
+</html>
