@@ -13,16 +13,21 @@ from django.core.paginator import Paginator
 def index(request):
     # Отримуємо всіх авторів з бази даних
     authors_list = Author.objects.all()
-    paginator = Paginator(authors_list, 5)  # Розбиваємо на сторінки, по 5 авторів на сторінку
 
-    page_number = request.GET.get('page')  # Отримуємо номер поточної сторінки
-    page_obj = paginator.get_page(page_number)  # Отримуємо об'єкт поточної сторінки
+    # Розбиваємо на сторінки, по 5 авторів на сторінку
+    paginator = Paginator(authors_list, 5)
 
+    # Отримуємо номер поточної сторінки
+    page_number = request.GET.get('page')
+
+    # Отримуємо об'єкт поточної сторінки
+    page_obj = paginator.get_page(page_number)
+
+    # Передаємо дані у контекст шаблону
     context = {
         'page_obj': page_obj,
     }
     return render(request, 'main_app/index.html', context)
-
 
 
 
@@ -54,34 +59,7 @@ def add_quote(request):
     return render(request, 'main_app/add_quote.html', {'form': form})
 
 
-def signup(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request)
-            #login(request, user)
-            return redirect('index')  
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'main_app/signup.html', {'form': form})
 
-def login(request):
-    if request.method == 'POST':
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect('index')  
-    else:
-        form = UserLoginForm()
-    return render(request, 'main_app/login.html', {'form': form})
 
 
 

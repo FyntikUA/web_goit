@@ -8,3 +8,5 @@ class AuthorAdmin(admin.ModelAdmin):
 @admin.register(Quote)
 class QuoteAdmin(admin.ModelAdmin):
     list_display = ('quote', 'author', 'tags')
+
+    

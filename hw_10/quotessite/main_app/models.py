@@ -10,11 +10,20 @@ class Author(models.Model):
     def __str__(self):
         return f"{self.fullname} - {self.born_date} - {self.born_location} - {self.description}"
 
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Quote(models.Model):
     quote = models.TextField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE,primary_key=True)
-    tags = models.CharField(max_length=100)
+    tags = models.ManyToManyField(Tag)
+    #tags = models.CharField(max_length=100)
 
     def __str__(self):
         return f"{self.quote} - {self.author.fullname} - {self.tags}"
+    
+
