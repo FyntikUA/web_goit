@@ -3,3 +3,4 @@
 /hw_10/quotessite/quotessite/__pycache__/*
 hw_10/quotessite/main_app/migrations/*
 *.py
+hw_10/quotessite/users_app/__pycache__/__init__.cpython-312.pyc
