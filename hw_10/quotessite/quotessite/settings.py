@@ -37,11 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'main_app',
     'main_app.apps.MainAppConfig',
     'users_app',
-    #'users_app.apps.UsersAppConfig',
-    #'user'
 ]
 
 MIDDLEWARE = [
@@ -86,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'q_db',
         'USER': 'postgres',
-        'PASSWORD': 'Sqrt0603',
+        'PASSWORD': '********',
         #'USER': env('PG_USER'),
         #'PASSWORD': env('PG_PASS'),
         'HOST': '127.0.0.1',
