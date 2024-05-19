@@ -2,3 +2,4 @@
 /hw_5/__pycache__/*
 /hw_10/quotessite/quotessite/__pycache__/*
 hw_10/quotessite/main_app/migrations/*
+*.py
