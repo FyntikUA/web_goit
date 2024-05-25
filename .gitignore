@@ -7,3 +7,7 @@ hw_10/quotessite/users_app/__pycache__/__init__.cpython-312.pyc
 hw_11/my_contacts_api/app/.env
 /hw_11/__pycache__
 /hw_11/my_contacts_api/app/__pycache__
+*.pyc
+/hw_10/quotessite/main_app/migrations
+/hw_10/quotessite/main_app/migrations
+/hw_10/quotessite/main_app/migrations
