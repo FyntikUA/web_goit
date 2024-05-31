@@ -1,27 +1,25 @@
-from fastapi import FastAPI, Depends, File, UploadFile, HTTPException
+from fastapi import FastAPI, Depends, File, UploadFile, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware import Middleware
-from starlette.middleware import Limiter, _rate_limit_exceeded_handler
-from fastapi.exceptions import RequestRateLimitExceeded
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
 from datetime import timedelta
-from . import models, schemas, crud, auth
+import models, schemas, crud, auth
 from .database import SessionLocal, engine
 import cloudinary
 
-
 models.Base.metadata.create_all(bind=engine)
 
-limiter = Limiter(key_func=lambda _: "global", default_limits=["5/minute"])
+limiter = Limiter(key_func=get_remote_address)
 
-middleware = [
-    Middleware(Limiter, global_limits=[limiter]),
-]
+app = FastAPI()
 
-app = FastAPI(middleware=middleware)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -47,11 +45,8 @@ def get_db():
     finally:
         db.close()
 
-@app.exception_handler(RequestRateLimitExceeded)
-def rate_limit_exceeded_handler(request, exc):
-    return _rate_limit_exceeded_handler(request, exc)
-
 @app.post("/users/", response_model=schemas.User, status_code=201)
+@limiter.limit("5/minute")
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Перевіряємо, чи існує користувач з такою ж електронною поштою
     db_user = crud.get_user_by_email(db, email=user.email)
@@ -81,6 +76,7 @@ def read_users_me(current_user: schemas.User = Depends(auth.get_current_user)):
     return current_user
 
 @app.post("/contacts/", response_model=schemas.Contact, status_code=201)
+@limiter.limit("5/minute")
 def create_contact(contact: schemas.ContactCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(auth.get_current_user)):
     return crud.create_contact(db=db, contact=contact, user_id=current_user.id)
 
@@ -121,17 +117,14 @@ def get_upcoming_birthdays(db: Session = Depends(get_db), current_user: schemas.
     return contacts
 
 @app.post("/users/avatar/")
+@limiter.limit("5/minute")
 def upload_avatar(file: UploadFile = File(...), current_user: schemas.User = Depends(auth.get_current_user)):
     if file.content_type.startswith("image/"):
-        # Завантаження файлу на Cloudinary
         response = upload(file.file)
         avatar_url = response["secure_url"]
-        
-        # Оновлення URL аватара користувача у базі даних
         db = SessionLocal()
         user = crud.update_user_avatar(db, user_id=current_user.id, avatar_url=avatar_url)
         db.close()
-        
         return {"avatar_url": avatar_url}
     else:
         raise HTTPException(status_code=400, detail="Only image files are allowed")
