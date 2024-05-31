@@ -3,8 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 
-
-from django import forms
 from .models import Author, Quote
 
 class AuthorForm(forms.ModelForm):
@@ -39,3 +37,6 @@ class UserRegistrationForm(UserCreationForm):
 class UserLoginForm(AuthenticationForm):
     class Meta:
         fields = ['username', 'password']
+
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(label='Email')

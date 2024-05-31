@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.template import loader
+#from django.http import HttpResponse
+#from django.template import loader
 from .forms import AuthorForm, QuoteForm
 from .models import Author, Quote
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import UserRegistrationForm, UserLoginForm
+#from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+#from .forms import UserRegistrationForm, UserLoginForm
 from django.core.paginator import Paginator
+from django.core.mail import send_mail
+from django.contrib import messages
+from .forms import PasswordResetForm
 
 
 def index(request):
@@ -60,7 +63,29 @@ def add_quote(request):
 
 
 
-
+def reset_password(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            # Отримайте дані форми
+            email = form.cleaned_data['email']
+             
+            send_mail(
+                'Password Reset',
+                'Click the link to reset your password.',
+                'from@example.com',
+                [email],
+                fail_silently=False,
+            )
+            
+            # Повідомлення про успішну відправку листа
+            messages.success(request, 'An email has been sent with instructions to reset your password.')
+            
+            # Перенаправлення на домашню сторінку або іншу відповідну сторінку
+            return render(request, 'main_app/reset_password.html')
+    else:
+        form = PasswordResetForm()
+    return render(request, 'main_app/reset_password.html', {'form': form})
 
 
 
