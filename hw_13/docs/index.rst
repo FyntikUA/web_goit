@@ -1,0 +1,28 @@
+.. my_api documentation master file, created by
+   sphinx-quickstart on Wed Jun 12 15:19:17 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to my_api's documentation!
+==================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+
+my_api main
+=========================
+
+.. automodule:: my_contacts_api.main
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
